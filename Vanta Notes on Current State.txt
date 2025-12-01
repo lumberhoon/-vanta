@@ -1,0 +1,375 @@
+Vanta Notes on Current State
+
+
+Main Folder: Vanta
+
+Inside the Main Vanta folder we create sub folders that can call each other to use the scripts and functions from each other
+
+sub folders
+
+commands, core, tests
+
+In the main folder we have main files called: vanta.py/vanta_gui.py
+
+The files above are the main files that are called in order to utilize all the files that are needed to be called.
+
+
+Inside the commands folder (which is the folder where command scripts are held), we have assistant.py, chat.py, code.py, config.py, notes.py, system.py
+
+Inside the core folder (which include the brain of Vanta and other core elements that are needed for the program to even run) we have...
+
+audio_io.py, brain.py, config.py, logger.py
+
+
+Write a section for:
+- brain.py
+- config.py
+- chat.py
+- assistant_command
+- system commands
+- GUI pipeline
+- voice pipeline 
+
+1. What problem does this file solve?
+2. What are the main functions?
+3. How does data flow through it?
+4. What did I learn here?
+5. What still confuses me?
+
+for brain.py:
+
+1. This file is the core router that processes input from the user into commands.
+2. The main and only function is process_input. We take the input from the user and strip it so the \n is removed. we separate the command input the user gives and the rest into 2 parts. we separate them in cmd and args. This way we can processs what the user wants to do with the argument that was given. We then utilize the routing table called commands which list out all of the available keys(commands) and values for those keys. For example if the cmd was chat, then we would go to chat_command which will start the chat.py file. We use assigned handler to be the cmd and if its none, aka its not a valid input, we tell the user this. If it is valid then we get the handlers(arg) which will be the result that is needed by the user and then we return it.
+3. The data starts from either vanta.py or vanta_gui. Then when the user inputs a command through it, it will activate process_input from brain.py, then after brain.py's processes the input, it takes the data to whereever the user command wants it to go. if its not valid we just a string that says unknown command, if it is valid we return the result of the command to vanta.py, vanta_gui.py whereever it was inputed from.
+4. I have learned proper architecture of programs. If the project is even a little bit big, then it should be divided into separate files/folders so its easy to organize and understand how everything is operated. If all of Vanta's code was in one file then I would struggle immensely on finding where I wanted to edit was. I also learned in brain.py that instead of making a bunch of if statements to check whether which command the user inputted, I can make a routing table and also use lambas instead of very small defs in order to make things a lot more simple and readable.
+5.What still confuses me is the code details it self.
+cmd_token = parts[0]
+    cmd = cmd_token.lower().strip(string.punctuation)
+
+I dont know why above we set cmdtoken as parts[0] and then set cmd as lower and strip string punctuation.. Will it not work if we just said cmd = parts[0].lower().strip(string.punctuation)???
+
+I also dont fully understand handler and command.get(cmd) as id like to be.
+
+If Handler is a valid cmd then it itself becomes the function for whatever the user needs.
+
+for config.py:
+
+1. There are two files that are called config.py, One for making a json file that stores all the configurations of Vanta, and the other letting the user getting the key values of the configs they choose, and also modify it. This solves the problem of hard coding attributes of vanta and not being able to be modified unless the whole code is changed. If something like the config of vanta is hardcoded, users will not be able to modify it easily to their liking. 
+
+2. ( we are doing core config first) For the core config.py the main function is load_config and save_config. We first make a path to a file named config.json. We set the values of the DEFAULT_CONFIG. DEFAULT is what we will use if there is no json files or there is an error with the previous file. THis is so the program doesn't crash. 
+
+load_config checks whether the file exists or not, then if it exists it TRYS to open the config file that already exists and loads it, if there is an error or the file is corrupting we save the default config instead. We also check whether there are any missing keys and values in the curremt cfg file. If there are, we only replace the ones that are missing witht the default value. Not the ones that exists.
+
+3. The json file always exist in the system, whenever something is changed by the user it will stay changed even when rebooted. It is kind of like a save file. Once the user uses it, a lot of the command uses the config.json file in order to see how vanta should act or is allowed to do or not. This is crucial as it changes how the ai acts. systems.py uses it to see if system_actions are allowed. config.py in the commands folder uses it to modify the json file, assistant.py uses it to change the gilfoyle_level, etc.
+
+4. I learned that a json file can be used in order to have flexibility in a program. To save data so users dont have to set up basic things that they asked for before, and also that something like the setting of a program shouldn't be hardcoded. This will be very valuable for me in order to create settings, video_game character skillset, etc. 
+
+5. something that still confuses me is just clarification. is json.load making json readable to python, and json.dump changing it back to a json format.
+
+
+Write a section for:
+- brain.py
+- config.py
+- chat.py
+- assistant_command
+- system commands
+- GUI pipeline
+- voice pipeline 
+
+1. What problem does this file solve?
+2. What are the main functions?
+3. How does data flow through it?
+4. What did I learn here?
+5. What still confuses me?
+
+
+for commands/config.py:
+
+1. this file is where the user actually gets to interact with the config file that was made in the core config.py. We give the user a choice between show, get, or set. in the brain we split the command and the arguments and here in the config file we use arg[0] in order to see what the user wants to do with the config. if arg[0] is show, then we show all the config values, get means a single config value is shown, set is changing and updating a config value. This is a clean way for users to see what can change in Vanta like a settings in a video game, and then change to whatever they desire. 
+
+2. the main functions are config_command and _parse_value_for_key.
+	
+config_command is where Vanta sees what command the user gave in order to give the right result. it checks whether the command is valid, depending on the command it will check whether there needs to be a key and value needed as well for commands. if the command was set, we would need to use _parse_value_for_key. For set we would check whether the command was valid, then for the final value the user is trying to change we use our function to change the string to an int if its an int key, or make the raw value all lowercase for bool keys and then check whether the value is a true/false. If any of these are an error, than an error is returned. If its not an eror than we save_config(cfg) and then show the user that the key has been updated.
+
+3. The user inputs a command that says for example: config show. The brain processes this splits the command and the args. It looks at the routing table and sees that config is a key to config_command. This then takes us to commands/config.py, and does whatever it needs and if it show or get, it returns a string of whatever the user needs to see and vanta prints that string. if it set then config_command will use save_config which accesses core/config.py which opens up the file and edits it, then we print out that its successful.
+
+4. Here I learned what real efficiency is. Splitting up config_command and parse value and making int_keys and bool_keys. I think something i learned especially is error management, making sure if there is an error we don't crash and we return something to the user that, that is not allowed. I also really liked how config/py in commands and core is separate to keep everything simple and clean. one to manage the json file and make sure its stable, loading, saving, etc... while the other one is specifically for the user commands and user interactions with the config. In short, I learned proper architecture, managing all cases of error, and pathing of the codes and calling functions.
+
+5. everything is straightforward in this file and i really dont have any confusion. I guess one thing I can ask is why specifically we have 2 values for _parse_value_for_key, like why do we return parsed_value, error.
+
+We return two separate items because one is for the result,
+and the other is for the error status/message.
+They have different purposes and must not be mixed.
+A valid result and an error message should never share the same variable
+
+
+- chat.py
+- assistant_command
+- system commands
+- GUI pipeline
+- voice pipeline 
+
+1. What problem does this file solve?
+2. What are the main functions?
+3. How does data flow through it?
+4. What did I learn here?
+5. What still confuses me?
+
+
+for chat.py:
+
+1. This file is where the magic of Vanta AI happens. Where the user says chat <message> and gets a reply back from Vanta AI through text. It also utilizes the config settings especially Gilfoyle level in order to change the mannerisms of the AI.
+
+2. The main function is OpenAI() and chat_command(args). Openai() is the function imported from openai that allows us to use the OpenAI LLM in order to have our 'own' AI. chat_command is how we process the users input based on the config. we first check for validation of the user's message and then once its valid we send it to chatgpt. we get the model and Gilfoyle level from config.json and then tell the command to try to get the response from client.chat.completions.create. this is how we do a call on the API and we list the model, and the message structure. then we get the reply text from the first response choice the ai generates and then we return reply_text unless there was an error which tem we return chat error message.
+
+3. The user types a chat command which goes through the brain and calls the chat_command. chat_command then asks itself whether the command that was given fits the format and is valid. Then it sets the settings of the ai prompt based on Gilfoyle level and then sends it to openai. It then returns the first response openai gives. where it prints on vanta.py or vanta_gui.
+
+4. I learned how to use openai in my own code to integrate it into my programs. How to edit prompt and use my configs to change the prompt of the ai. This I feel will be useful for future jobs and I feel like ive only gotten a taste of it so far.
+
+
+5. when we use client.chat.completiions.create I assume that is something that is provide with openai, same with response.choices. but i want to know    messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message}, In this code what role, system, user etc mean exactly
+
+
+OpenAI(): creates an openai client object that knows how to communicate with the openai api using the api key stored in environment variables. without thi, we can't call the model.
+
+
+
+ assistant_command
+- system commands
+- GUI pipeline
+- voice pipeline 
+
+1. What problem does this file solve?
+2. What are the main functions?
+3. How does data flow through it?
+4. What did I learn here?
+5. What still confuses me?
+
+
+for assistant_command:
+
+1. we created assistant.py because we needed the ai to be able to open apps or change config settings the user wants through text or voice. we also wanted to keep the functionality of being able to talk with it as well like a normal ai. This command makes it possible.
+
+2.The main function is assistant_command and build assistant system prompt. the latter is just setting on the prompt for the ai based on the level of Gilfoyle. Assistant command is where the magic really happens. We do the standard validation check of what the user is asking for. We take the message the user gives it after the command and join them together into one string. Then we get the config to get the model and prompt of the ai. In the prompt we detail listed out everything we needed it to do including formatting our cli commands. If we ask it to open discord it will do sys open discord for example. It also gets the Gilfoyle level to either be happy or annoying. We then get the first response choice and lowercase the whole thing. Then we check whether the string starts with command or chat in order to see if it was a command or chat the user wanted. then we remove the chat:, command: from the string so the user doesn't see it. then we return it. if there is an issue then our fallback is to just return raw which is the exact response the ai gave. 
+
+3. this operates almost the same as chat.py. it starts with user input -> brain.process_input -> assistant_command -> print from vanta
+
+4. This is fascinating code architecture. It is so clever that we decipher whether the result is a command or chat by making the ai separate for us and categorizing it with the first word of the string. and the fact that there is a base instruction and then a separate instruction for the style of the ai using the Gilfoyle level. 
+
+5. Thing that confuses me a little is why do we return raw as a fallback? what kind of error is it falling back for if it happens
+
+- system commands
+- GUI pipeline
+- voice pipeline 
+
+1. What problem does this file solve?
+2. What are the main functions?
+3. How does data flow through it?
+4. What did I learn here?
+5. What still confuses me?
+
+
+
+
+for system commands:
+
+1.  system.py solves the problem of opening apps through a command. Instead of clicking links or finding it in files, all you have to do is type it in terminal or with the GUI you can use push to talk to use your voice for it.
+
+2. The main functions are _open_app, _system_info, system_command. system_command is what utilizes open app and system info depending on the sub aka command that is given by the user. if there is no args or args[0] is in help, we return what system commands there are. If we have args then we lowercase it and call it sub. if sub is info we call system_info, if its open, we call open_app.  system info utilizes the platform module to get the user's system info and then we return that info. open app gets the system info utilizing platform as well and also gets the target_key which is the app the user wants to open and then its is lowered and stripped. we also make app_cmd equal to the app and its location by using a routing table like we did for brain. We called this routing table APP_ALAISES. After checking if system action is enabled, we open the app using Popen. and return a string that lets the user know the app is launching.
+
+3. The user inputs the command and goes through brain which calls system_command. System command gets the command and sees whether the user wants info or open, then open app or system info is called depending on it. Then whatever the user i needed is done and printed as well on vanta or vanta gui.
+
+4. i learned that you can open apps using the file location of an app like we did for discord. I also deepened my knowledge of the use cases for routing tables and they look so useful. I think im starting to notice a pattern in functions. One is for routing/brain to call other functions. then one function does one specific thing and the other does another specific thing. This is how we keep a clean architecture. system_command could've done open_app and system_info as well, but it would be harder to debug and read. 
+
+5. i think im still confused a little by the subprocess module and what is specifically does. I know it is used to open up the app but how does it do it? We say subprocess.Popen but what does that do? 
+
+
+
+- GUI pipeline
+- voice pipeline 
+
+1. What problem does this file solve?
+2. What are the main functions?
+3. How does data flow through it?
+4. What did I learn here?
+5. What still confuses me?
+
+
+GUI Pipeline Notes (vanta_gui.py)
+
+1. What problem does this file solve?
+It provides a readable UI where users can interact with Vanta in a chat-like interface instead of typing everything in a terminal. It sets up the structure necessary for turning Vanta into a real app later (.exe, overlay mode, etc.).
+
+2. Main Functions / Components
+
+class VantaGUI – holds all GUI behavior
+
+__init__ – builds the interface elements and layout
+
+_append_text – prints messages into the output text area and keeps the history un-editable
+
+_on_send – sends text input to the brain through process_input()
+
+_on_enter – shortcut to trigger _on_send with Enter key
+
+_on_ptt_press – calls start_recording() from audio_io.py
+
+_on_ptt_release – calls stop_and_transcribe() and then sends result to process_input()
+
+main() – initializes the Tkinter loop so the window stays open
+
+3. Data Flow
+
+User input typed or spoken
+→ GUI collects input
+→ GUI sends input to Brain via process_input()
+→ Brain decides what to do and returns result text
+→ GUI displays result using _append_text
+
+
+Voice path:
+
+PTT press → start_recording()
+PTT release → stop_and_transcribe()
+→ GUI receives transcribed text
+→ process_input()
+→ append_text()
+
+
+4. What I learned
+
+Basics of how Tkinter builds GUI components
+
+How to structure code inside a class like VantaGUI
+
+How _append_text manages formatting and history behavior
+
+How event handlers like Enter and buttons connect to functions
+
+5. What still confuses me
+
+Tkinter layout functions (grid, columnconfigure, rowconfigure, Frame, bind)
+
+Understanding how UI threading works to prevent freezing (coming next)
+
+
+
+
+- voice pipeline 
+
+1. What problem does this file solve?
+2. What are the main functions?
+3. How does data flow through it?
+4. What did I learn here?
+5. What still confuses me?
+	
+for voice pipeline:
+
+1. This solves the problem of recording audio and turning it into text, and taking text and turning it into audio. 
+
+2. main functions are
+
+start recording: 
+
+starts recording from the default microphone using sounddevice.InputStream aka sd input stream. 
+
+Uses callback() repeatedly with small chunks of audio and appends them into _current_chunks
+
+uses the global variables _current_stream _current_chunks.
+
+current_stream is the active recording stream
+current chunks: the list of numpy arrays of audio data
+
+if audio is stll recording, it just returns and does nothing
+
+
+
+_stop_recording_to_file: 
+
+Stops and closes _current_stream
+Resets _current_stream to None
+
+If no chunks were recorded, returns False
+
+If there are chunks: 
+
+uses np.concatenate to combine them into one big array. 
+
+writes the chunks as WAV file to path, with soundfile.write
+
+returns true if succesful
+
+
+
+
+_transcribe_file:
+
+Opens the WAV in binary mode and sends to client.audio.transcriptions.create()
+returns the transcribed text as a stripped string
+
+
+stop_and_transcribe:
+
+creates a temporary directory with tempfile.TemporaryDirectory()
+
+creates a path like input.wav inside the tempfile
+
+calls stop recording to file(wav path) 
+	if no audio was recorded, returns empty string
+
+returns the final transcript string
+
+speak_text: 
+
+takes the text and creates a temporary directory and defines out.wav
+
+it calls the client.audio.speech.create() 
+
+reads the audio bytes from the response and writes them to out.wav
+
+uses soundfile.read to load the WAV
+
+uses sounddevice.play and sd.wait() to play the audio to your speakers.
+
+
+3. microphone -> small NumPy chunks -> glued into 1 WAV file -> sent to OpenAI -> text 
+
+during recording audio is not in a file but lives as a listof NumPy arrays in _current_chunks
+
+_callback calls → [_chunk0, _chunk1, _chunk2, ...]
+
+stop_and_transcribe is where the temp folder and fie path is made
+
+then it calls stop recording to file and then transcribes
+
+transcribe_file opens the WAV file in binary mode and then gets the text from openai speech to text and then returns the result.text.strip()
+
+
+Speaker pipeline
+
+Text -> OpenAI TTS -> WAV file -> sounddevice plays it -> sd.wait()  blocks until done
+
+creates empty temp file and then calls openai tts and reads the text to speech audio. Then we write that audio into the temp file we created, and then we read the file and play it then wait till it ends.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,7 @@
+{
+    "default_model": "gpt-4.1-mini",
+    "gilfoyle_level": 3,
+    "voice_enabled": false,
+    "system_actions_enabled": true,
+    "log_level": "info"
+}

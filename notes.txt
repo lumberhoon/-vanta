@@ -1,0 +1,3 @@
+finish cs50 week 7
+work on vanta 0.1
+finish cs50 week 5
