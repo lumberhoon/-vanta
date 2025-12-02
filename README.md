@@ -107,7 +107,7 @@ Press F4 to activate voice mode
 
 ## Screenshot
 
-![Vanta Screenshot](assets/vanta_screenshot.png)
+![Vanta Screenshot](assets/vanta0.2.png)
 
 ---
 
