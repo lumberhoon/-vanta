@@ -1,25 +1,28 @@
-# Build & EXE
-dist/
-build/
-*.spec
-*.exe
+# Virtual env
+.venv/
+venv/
 
 # Python cache
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 
-# Virtual environment
-.venv/
-.env
+# Build artifacts
+build/
+dist/
+*.spec
 
-# Logs
-*.log
-chat_history.log
-vanta.log
-
-# VSCode junk
+# VS Code settings
 .vscode/
 
-# Resources not needed in repo
+# Audio files
 *.wav
-*.ico
+
+# Logs / history
+*.log
+chat_history.txt
+
+# OS junk
+.DS_Store
+Thumbs.db
