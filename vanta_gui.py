@@ -244,7 +244,7 @@ class VantaGUI:
         except Exception:
             pass
        
-        self._append_text("[voice] Processiong audio...\n")
+        self._append_text("[voice] Processing audio...\n")
 
         self._process_voice_async()       
 
