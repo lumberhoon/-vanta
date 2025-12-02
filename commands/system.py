@@ -8,8 +8,6 @@ from core import config
 from core.paths import ALIAS_FILE
 
 APP_ALIASES = {
-    "discord": r"C:\Users\danie\AppData\Local\Discord\app-1.0.9216\Discord.exe",
-    "league": r"C:\Riot Games\Riot Client\RiotClientServices.exe",
     "chrome": "chrome",
     "edge": "msedge",
     "explorer": "explorer",
