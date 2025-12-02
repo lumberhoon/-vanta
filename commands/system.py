@@ -2,7 +2,6 @@
 import platform
 import subprocess
 from pathlib import Path
-from core import config
 from tkinter import filedialog
 import json
 from core import config
@@ -110,18 +109,17 @@ def system_command(args):
 
     if not args or args[0] in {"help", "-h", "--help"}:
         return (
-            "System commands:\n"
-        "  sys info             - show basic system information\n"
-        "  sys open <app>       - open an application (Windows only)\n"
-        "  sys addapp <name>    - map a name to an executable\n"
-        "  sys listapps         - list all known app aliases\n"
-        "  addapp <name>        - same as sys addapp\n"
-        "  sys remove <name>    - removes app from listing"
-            "Examples:\n"
-            "  sys info\n"
-            "  sys open discord\n"
-            "  sys open notepad\n"
-            "  sys open explorer\n"
+            "[sys] System command usage:\n"
+            "  sys                 - show this help\n"
+            "  sys info            - show basic system info\n"
+            "  sys listapps        - list all known app aliases\n"
+            "  sys addapp          - add or override an app alias (interactive file picker)\n"
+            "  sys removeapp <name>- remove a user-defined app alias\n"
+            "\n"
+            "You can also use natural language:\n"
+            "  open chrome\n"
+            "  launch discord\n"
+            "  start vscode\n"
         )
     
     sub = args[0].lower()
@@ -172,8 +170,8 @@ def _add_app_interactive(name: str) -> str:
     _save_user_aliases(user_aliases)
 
     return (
-        f"[sys] Mapped '{name}' to:\n {path}\n"
-        f"You can now say:open {name}"
+        f"[sys] Added alias '{name}' -> {path}\n"
+        f"You can now say: open {name}"
     )
 
 def _list_apps() -> str:

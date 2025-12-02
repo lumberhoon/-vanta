@@ -1,8 +1,17 @@
+# Core AI / API
 openai>=1.0.0
+
+# Audio & voice
 sounddevice>=0.4.6
 soundfile>=0.12.1
 SpeechRecognition>=3.10.0
 PyAudio>=0.2.14
+
+# Hotkeys
 keyboard>=0.13.5
+
+# Utils
 numpy>=1.26.0
+
+# Packaging
 pyinstaller>=6.0
